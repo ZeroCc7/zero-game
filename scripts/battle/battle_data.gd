@@ -2,8 +2,8 @@ class_name BattleData
 extends RefCounted
 
 static func create_combatants() -> Array[Combatant]:
-	var player_skills := _create_player_skills()
-	var enemy_skills := _create_enemy_skills()
+	var player_skills: Dictionary = _create_player_skills()
+	var enemy_skills: Dictionary = _create_enemy_skills()
 	var units: Array[Combatant] = []
 
 	units.append(Combatant.new("player_gold", "金阙剑修", BattleConstants.Team.PLAYER, BattleConstants.Element.GOLD, 68, 15236, 100, 820, 880, 420, 75, player_skills["gold"], 0))
