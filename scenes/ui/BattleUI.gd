@@ -20,7 +20,7 @@ var selected_skill: Skill
 @onready var end_turn_button: Button = $BottomHud/EndTurnButton
 @onready var result_label: Label = $ResultLabel
 @onready var target_hint: Label = $CenterPrompt/TargetHint
-@onready var action_log: Label = $CenterPrompt/ActionLog
+@onready var action_log: Label = $LeftLogPanel/ActionLog
 @onready var turn_track: HBoxContainer = $BottomHud/TurnTrack
 @onready var round_plate: Label = $BottomHud/RoundPlate
 
@@ -56,9 +56,9 @@ func bind_actor(actor: Combatant) -> void:
 	clear_selected_skill()
 
 func set_round(round_number: int) -> void:
-	round_label.text = "Round %d/20" % round_number
-	round_plate.text = "Round %d" % round_number
-	condition_label.text = "Win: defeat all enemy units"
+	round_label.text = "回合 %d/20" % round_number
+	round_plate.text = "第 %d 回合" % round_number
+	condition_label.text = "胜利条件：击败敌方所有单位"
 
 func set_turn_order(turn_queue: Array[Combatant]) -> void:
 	for child in turn_track.get_children():
@@ -73,7 +73,7 @@ func set_turn_order(turn_queue: Array[Combatant]) -> void:
 			break
 
 func show_result(winner_team: BattleConstants.Team) -> void:
-	result_label.text = "VICTORY" if winner_team == BattleConstants.Team.PLAYER else "DEFEAT"
+	result_label.text = "胜利" if winner_team == BattleConstants.Team.PLAYER else "失败"
 	result_label.visible = true
 	target_hint.visible = false
 	for button in skill_buttons:
@@ -82,7 +82,7 @@ func show_result(winner_team: BattleConstants.Team) -> void:
 
 func set_selected_skill(skill: Skill) -> void:
 	selected_skill = skill
-	target_hint.text = "Select target: %s" % skill.display_name
+	target_hint.text = "选择目标：%s" % skill.display_name
 	target_hint.visible = true
 	for index in range(skill_buttons.size()):
 		var button := skill_buttons[index]
@@ -95,7 +95,7 @@ func clear_selected_skill() -> void:
 		button.modulate = Color.WHITE
 
 func show_action(actor: Combatant, skill: Skill, affected_count: int) -> void:
-	action_log.text = "%s used %s, hit %d target(s)" % [actor.display_name, skill.display_name, affected_count]
+	action_log.text = "%s 使用 %s，命中 %d 个目标" % [actor.display_name, skill.display_name, affected_count]
 
 func _create_turn_badge(unit: Combatant, is_current: bool) -> Control:
 	var holder := VBoxContainer.new()
@@ -116,7 +116,7 @@ func _create_turn_badge(unit: Combatant, is_current: bool) -> Control:
 
 	var type_label := Label.new()
 	type_label.custom_minimum_size = Vector2(52, 12)
-	type_label.text = "PET" if unit.unit_type == BattleConstants.UnitType.PET else "UNIT"
+	type_label.text = "宠物" if unit.unit_type == BattleConstants.UnitType.PET else "角色"
 	type_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	type_label.add_theme_color_override("font_color", Color(0.74, 0.63, 0.42, 1.0))
 	type_label.add_theme_font_size_override("font_size", 9)
@@ -125,11 +125,11 @@ func _create_turn_badge(unit: Combatant, is_current: bool) -> Control:
 
 func _badge_text(unit: Combatant) -> String:
 	if unit.team == BattleConstants.Team.PLAYER:
-		return "P" if unit.unit_type == BattleConstants.UnitType.CHARACTER else "Pet"
-	return "E" if unit.unit_type == BattleConstants.UnitType.CHARACTER else "Beast"
+		return "我" if unit.unit_type == BattleConstants.UnitType.CHARACTER else "宠"
+	return "敌" if unit.unit_type == BattleConstants.UnitType.CHARACTER else "兽"
 
 func _style_panels() -> void:
-	for panel_path in ["TopInfoPanel", "BottomHud", "BottomHud/ActorPanel", "CenterPrompt", "BottomHud/ActorPanel/PortraitFrame"]:
+	for panel_path in ["TopInfoPanel", "LeftLogPanel", "BottomHud", "BottomHud/ActorPanel", "CenterPrompt", "BottomHud/ActorPanel/PortraitFrame"]:
 		var panel := get_node(panel_path) as Control
 		panel.add_theme_stylebox_override("panel", _box(DARK_PANEL, Color(0.55, 0.38, 0.18, 0.95), 2, 4))
 	round_label.add_theme_color_override("font_color", PALE_GOLD)
