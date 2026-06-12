@@ -40,6 +40,7 @@ func _on_actor_changed(actor: Combatant) -> void:
 	battle_ui.bind_actor(actor)
 	for unit_id in combatant_views:
 		var view = combatant_views[unit_id]
+		view.refresh()
 		view.set_active(view.combatant == actor)
 		view.set_selectable(actor.team == BattleConstants.Team.PLAYER and view.combatant.team != actor.team and view.combatant.is_alive())
 	if actor.team == BattleConstants.Team.ENEMY:
