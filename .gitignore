@@ -1,4 +1,8 @@
 .superpowers/
 .worktrees/
 .godot/
+.appdata/
+.localappdata/
+godot-*.log
+test-results.txt
 *.tmp
