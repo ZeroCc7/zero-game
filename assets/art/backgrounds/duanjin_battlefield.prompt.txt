@@ -1,0 +1,11 @@
+Use case: stylized-concept
+Asset type: Godot 4 battle background, 1920x1080 landscape
+Primary request: dark Chinese wuxia tactical battle arena background inspired by the provided reference style, but original composition
+Scene/backdrop: ruined stone fortress courtyard, broken walls, old banners, cold mist, scattered debris, brazier fire glows, ancient gate ruins
+Subject: empty battlefield only, no characters, no pets, no UI, no text
+Style/medium: high quality dark fantasy Chinese martial arts game concept art, semi-realistic painted game background
+Composition/framing: 3/4 top-down tactical battle camera, wide 16:9, central stone arena clearly open for units, enemy side upper half, player side lower half, strong depth perspective
+Lighting/mood: moody grey-blue daylight through fog, warm orange fire accents, dramatic but readable
+Color palette: charcoal stone, muted browns, cold greys, antique gold accents, restrained red banners
+Constraints: no UI, no text, no labels, no characters, no monsters, no obvious copyrighted elements, keep center and lower-middle readable for gameplay units
+Avoid: anime flat color, cartoon style, cyberpunk, modern objects, excessive brightness, cluttered center
