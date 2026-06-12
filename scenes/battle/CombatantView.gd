@@ -4,13 +4,21 @@ const PLAYER_GOLD_IDLE_FRAMES := [
 	"res://assets/art/units/gold_swordsman/idle/gold_swordsman_idle-1.png",
 	"res://assets/art/units/gold_swordsman/idle/gold_swordsman_idle-2.png",
 	"res://assets/art/units/gold_swordsman/idle/gold_swordsman_idle-3.png",
-	"res://assets/art/units/gold_swordsman/idle/gold_swordsman_idle-4.png"
+	"res://assets/art/units/gold_swordsman/idle/gold_swordsman_idle-4.png",
+	"res://assets/art/units/gold_swordsman/idle/gold_swordsman_idle-5.png",
+	"res://assets/art/units/gold_swordsman/idle/gold_swordsman_idle-6.png",
+	"res://assets/art/units/gold_swordsman/idle/gold_swordsman_idle-7.png",
+	"res://assets/art/units/gold_swordsman/idle/gold_swordsman_idle-8.png"
 ]
 const PET_GOLD_IDLE_FRAMES := [
 	"res://assets/art/units/gold_lion_pet/idle/gold_lion_pet_idle-1.png",
 	"res://assets/art/units/gold_lion_pet/idle/gold_lion_pet_idle-2.png",
 	"res://assets/art/units/gold_lion_pet/idle/gold_lion_pet_idle-3.png",
-	"res://assets/art/units/gold_lion_pet/idle/gold_lion_pet_idle-4.png"
+	"res://assets/art/units/gold_lion_pet/idle/gold_lion_pet_idle-4.png",
+	"res://assets/art/units/gold_lion_pet/idle/gold_lion_pet_idle-5.png",
+	"res://assets/art/units/gold_lion_pet/idle/gold_lion_pet_idle-6.png",
+	"res://assets/art/units/gold_lion_pet/idle/gold_lion_pet_idle-7.png",
+	"res://assets/art/units/gold_lion_pet/idle/gold_lion_pet_idle-8.png"
 ]
 
 var combatant: Combatant
@@ -129,9 +137,13 @@ func _apply_unit_sprite() -> void:
 	var frames := SpriteFrames.new()
 	frames.add_animation("idle")
 	frames.set_animation_loop("idle", true)
-	frames.set_animation_speed("idle", 5.0)
+	frames.set_animation_speed("idle", 8.0)
 
-	for path in frame_paths:
+	var playback_paths := frame_paths.duplicate()
+	for index in range(frame_paths.size() - 2, 0, -1):
+		playback_paths.append(frame_paths[index])
+
+	for path in playback_paths:
 		var texture := load(path) as Texture2D
 		if texture == null:
 			sprite.visible = false
