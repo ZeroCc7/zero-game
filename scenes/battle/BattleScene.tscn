@@ -17,6 +17,3 @@ color = Color(0.10, 0.09, 0.08, 1)
 [node name="UIRoot" type="CanvasLayer" parent="."]
 
 [node name="BattleUI" parent="UIRoot" instance=ExtResource("3")]
-offset_left = 173.0
-offset_top = 97.0
-scale = Vector2(0.82, 0.82)
