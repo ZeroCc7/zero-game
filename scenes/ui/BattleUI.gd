@@ -11,6 +11,7 @@ var skill_buttons: Array[Button] = []
 @onready var current_hp: ProgressBar = $CurrentPanel/CurrentHp
 @onready var current_resource: ProgressBar = $CurrentPanel/CurrentResource
 @onready var end_turn_button: Button = $EndTurnButton
+@onready var result_label: Label = $ResultLabel
 
 func _ready() -> void:
 	skill_buttons = [$SkillBar/Skill0, $SkillBar/Skill1, $SkillBar/Skill2, $SkillBar/Skill3]
@@ -33,6 +34,13 @@ func bind_actor(actor: Combatant) -> void:
 
 func set_round(round_number: int) -> void:
 	round_label.text = "回合 %d" % round_number
+
+func show_result(winner_team: BattleConstants.Team) -> void:
+	result_label.text = "胜利" if winner_team == BattleConstants.Team.PLAYER else "失败"
+	result_label.visible = true
+	for button in skill_buttons:
+		button.disabled = true
+	end_turn_button.disabled = true
 
 func _on_skill_pressed(index: int) -> void:
 	if current_actor == null:

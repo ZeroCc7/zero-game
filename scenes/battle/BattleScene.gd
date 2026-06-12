@@ -81,8 +81,10 @@ func _on_skill_resolved(_actor: Combatant, _skill: Skill, _targets: Array, _resu
 		view.refresh()
 
 func _on_battle_finished(winner_team: BattleConstants.Team) -> void:
-	var result := "胜利" if winner_team == BattleConstants.Team.PLAYER else "失败"
-	print("Battle finished: %s" % result)
+	selected_skill = null
+	battle_ui.show_result(winner_team)
+	for view in combatant_views.values():
+		view.set_selectable(false)
 
 func _targets_for_skill(actor: Combatant, skill: Skill, clicked_target: Combatant) -> Array:
 	match skill.target_rule:
