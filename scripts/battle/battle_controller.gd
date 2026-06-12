@@ -21,8 +21,10 @@ func start_battle(p_units: Array[Combatant]) -> void:
 	emit_signal("battle_started", units)
 	_check_victory()
 	if not is_finished():
-		_update_phase_for_actor(current_actor())
-		emit_signal("actor_changed", current_actor())
+		var actor := _prepare_next_actor()
+		if actor != null:
+			_update_phase_for_actor(actor)
+			emit_signal("actor_changed", actor)
 
 func current_actor() -> Combatant:
 	while not turn_queue.is_empty() and not turn_queue[0].is_alive():
@@ -69,14 +71,9 @@ func _advance_turn() -> void:
 		round_number += 1
 		_rebuild_turn_queue()
 
-	var actor := current_actor()
-	if actor != null:
-		EffectResolver.apply_turn_start_statuses(actor)
-	_check_victory()
-	if is_finished():
+	var actor := _prepare_next_actor()
+	if actor == null:
 		return
-
-	actor = current_actor()
 	_update_phase_for_actor(actor)
 	emit_signal("actor_changed", actor)
 
@@ -112,3 +109,23 @@ func _update_phase_for_actor(actor: Combatant) -> void:
 		phase = BattleConstants.BattlePhase.WAITING_FOR_PLAYER_SKILL
 	else:
 		phase = BattleConstants.BattlePhase.ENEMY_ACTING
+
+func _prepare_next_actor() -> Combatant:
+	while true:
+		if turn_queue.is_empty():
+			round_number += 1
+			_rebuild_turn_queue()
+		var actor := current_actor()
+		if actor == null:
+			return null
+
+		var can_act_before_tick := EffectResolver.can_act(actor)
+		EffectResolver.apply_turn_start_statuses(actor)
+		_check_victory()
+		if is_finished():
+			return null
+
+		if can_act_before_tick:
+			return actor
+
+		turn_queue.pop_front()
