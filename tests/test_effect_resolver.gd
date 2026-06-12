@@ -7,6 +7,7 @@ func run() -> Array[String]:
 	_test_spell_deals_damage(failures)
 	_test_resource_gate_blocks_skill(failures)
 	_test_poison_ticks_damage(failures)
+	_test_defense_status_reduces_damage(failures)
 	return failures
 
 func _test_spell_deals_damage(failures: Array[String]) -> void:
@@ -39,6 +40,20 @@ func _test_poison_ticks_damage(failures: Array[String]) -> void:
 	EffectResolver.apply_turn_start_statuses(target)
 	if target.hp != before_hp - 120:
 		failures.append("poison should tick exact power damage")
+
+func _test_defense_status_reduces_damage(failures: Array[String]) -> void:
+	var skill := _spell_skill()
+	var attacker := _combatant("attacker", BattleConstants.Team.PLAYER, 100, 80, 18, _skills(skill))
+	var normal_target := _combatant("normal_target", BattleConstants.Team.ENEMY, 100, 20, 12, _no_skills())
+	var defended_target := _combatant("defended_target", BattleConstants.Team.ENEMY, 100, 20, 12, _no_skills())
+	defended_target.add_status(StatusEffect.new(BattleConstants.StatusKind.DEFENSE_UP, "Defend", 1, 120))
+	EffectResolver.apply_skill(attacker, skill, [normal_target])
+	attacker.resource = attacker.max_resource
+	EffectResolver.apply_skill(attacker, skill, [defended_target])
+	var normal_damage := normal_target.max_hp - normal_target.hp
+	var defended_damage := defended_target.max_hp - defended_target.hp
+	if defended_damage >= normal_damage:
+		failures.append("defense status should reduce incoming damage")
 
 func _spell_skill() -> Skill:
 	return Skill.new(

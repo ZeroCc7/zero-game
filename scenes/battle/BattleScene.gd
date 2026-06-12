@@ -164,4 +164,13 @@ func _position_for(unit: Combatant) -> Vector2:
 		Vector2(1330, 735),
 		Vector2(1510, 695)
 	]
+	var pet_positions := [
+		Vector2(720, 610),
+		Vector2(920, 570),
+		Vector2(1120, 570),
+		Vector2(1320, 610),
+		Vector2(1520, 570)
+	]
+	if unit.team == BattleConstants.Team.PLAYER and unit.unit_type == BattleConstants.UnitType.PET:
+		return pet_positions[unit.position_index]
 	return player_positions[unit.position_index] if unit.team == BattleConstants.Team.PLAYER else enemy_positions[unit.position_index]

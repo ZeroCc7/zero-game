@@ -8,6 +8,7 @@ func run() -> Array[String]:
 	_test_first_actor_is_highest_speed(failures)
 	_test_victory_when_enemies_dead(failures)
 	_test_controlled_actor_is_skipped(failures)
+	_test_player_party_has_front_row_pets(failures)
 	return failures
 
 func _test_first_actor_is_highest_speed(failures: Array[String]) -> void:
@@ -47,3 +48,21 @@ func _test_controlled_actor_is_skipped(failures: Array[String]) -> void:
 		failures.append("controlled actor skip should leave another actor")
 	elif next_actor == controlled_actor:
 		failures.append("controlled actor should be skipped after acting unit advances")
+
+func _test_player_party_has_front_row_pets(failures: Array[String]) -> void:
+	var units := BattleData.create_combatants()
+	var player_characters := 0
+	var player_pets := 0
+	for unit in units:
+		if unit.team != BattleConstants.Team.PLAYER:
+			continue
+		if unit.unit_type == BattleConstants.UnitType.CHARACTER:
+			player_characters += 1
+		elif unit.unit_type == BattleConstants.UnitType.PET:
+			player_pets += 1
+			if unit.skills.size() < 4:
+				failures.append("pet should expose attack, defense, active skill, and support skill")
+	if player_characters != 5:
+		failures.append("player party should keep five characters")
+	if player_pets != 5:
+		failures.append("player party should add one pet per character")

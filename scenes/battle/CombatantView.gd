@@ -2,6 +2,7 @@ extends Node2D
 
 var combatant: Combatant
 var last_hp: int = -1
+var base_scale := Vector2.ONE
 
 @onready var click_area: Area2D = $ClickArea
 @onready var ring: ColorRect = $Ring
@@ -21,6 +22,8 @@ func _ready() -> void:
 func bind(p_combatant: Combatant) -> void:
 	combatant = p_combatant
 	last_hp = combatant.hp
+	base_scale = Vector2(0.82, 0.82) if combatant.unit_type == BattleConstants.UnitType.PET else Vector2.ONE
+	scale = base_scale
 	_update_static_colors()
 	refresh()
 
@@ -46,7 +49,7 @@ func refresh() -> void:
 	last_hp = combatant.hp
 
 func set_active(is_active: bool) -> void:
-	scale = Vector2(1.12, 1.12) if is_active else Vector2.ONE
+	scale = base_scale * 1.12 if is_active else base_scale
 
 func set_selectable(is_selectable: bool) -> void:
 	modulate = Color(1.25, 1.16, 0.72, 1.0) if is_selectable else Color.WHITE

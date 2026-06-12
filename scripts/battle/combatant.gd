@@ -4,6 +4,7 @@ extends RefCounted
 var id: String
 var display_name: String
 var team: BattleConstants.Team
+var unit_type: BattleConstants.UnitType
 var element: BattleConstants.Element
 var level: int
 var max_hp: int
@@ -31,11 +32,13 @@ func _init(
 	p_defense: int,
 	p_speed: int,
 	p_skills: Array[Skill],
-	p_position_index: int
+	p_position_index: int,
+	p_unit_type: BattleConstants.UnitType = BattleConstants.UnitType.CHARACTER
 ) -> void:
 	id = p_id
 	display_name = p_display_name
 	team = p_team
+	unit_type = p_unit_type
 	element = p_element
 	level = p_level
 	max_hp = p_max_hp

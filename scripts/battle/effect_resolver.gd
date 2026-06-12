@@ -90,7 +90,11 @@ static func _apply_ultimate(attacker: Combatant, skill: Skill, target: Combatant
 static func _apply_damage(target: Combatant, amount: int) -> void:
 	if target.has_status(BattleConstants.StatusKind.FREEZE):
 		return
-	target.hp = max(0, target.hp - amount)
+	var final_amount := amount
+	for status in target.statuses:
+		if status.kind == BattleConstants.StatusKind.DEFENSE_UP and status.remaining_turns > 0:
+			final_amount = max(1, final_amount - status.power)
+	target.hp = max(0, target.hp - final_amount)
 	if target.has_status(BattleConstants.StatusKind.SLEEP_LOCK):
 		_remove_status(target, BattleConstants.StatusKind.SLEEP_LOCK)
 

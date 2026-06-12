@@ -2,6 +2,7 @@ class_name BattleConstants
 extends RefCounted
 
 enum Team { PLAYER, ENEMY }
+enum UnitType { CHARACTER, PET }
 enum Element { GOLD, WOOD, WATER, FIRE, EARTH, NONE }
 enum SkillKind { PHYSICAL, SPELL, OBSTACLE, SUPPORT, ULTIMATE }
 enum TargetRule { SINGLE_ENEMY, MULTI_ENEMY, SINGLE_ALLY, MULTI_ALLY, SELF, ALL_ENEMIES, ALL_ALLIES }
