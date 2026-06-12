@@ -129,3 +129,4 @@ func _prepare_next_actor() -> Combatant:
 			return actor
 
 		turn_queue.pop_front()
+	return null
