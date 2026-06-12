@@ -9,6 +9,7 @@ func run() -> Array[String]:
 	_test_victory_when_enemies_dead(failures)
 	_test_controlled_actor_is_skipped(failures)
 	_test_player_party_has_front_row_pets(failures)
+	_test_enemy_party_supports_ten_units(failures)
 	return failures
 
 func _test_first_actor_is_highest_speed(failures: Array[String]) -> void:
@@ -17,7 +18,7 @@ func _test_first_actor_is_highest_speed(failures: Array[String]) -> void:
 	var actor := controller.current_actor()
 	if actor == null:
 		failures.append("first actor should exist")
-	elif actor.display_name != "赤焰道君":
+	elif actor.id != "player_fire":
 		failures.append("highest speed player fire unit should act first")
 
 func _test_victory_when_enemies_dead(failures: Array[String]) -> void:
@@ -41,7 +42,7 @@ func _test_controlled_actor_is_skipped(failures: Array[String]) -> void:
 		return
 	var first_actor := controller.current_actor()
 	var controlled_actor := controller.turn_queue[1]
-	controlled_actor.add_status(StatusEffect.new(BattleConstants.StatusKind.FREEZE, "冰冻", 1, 0))
+	controlled_actor.add_status(StatusEffect.new(BattleConstants.StatusKind.FREEZE, "Freeze", 1, 0))
 	controller.player_use_skill(first_actor.skills[0], [])
 	var next_actor := controller.current_actor()
 	if next_actor == null:
@@ -50,19 +51,28 @@ func _test_controlled_actor_is_skipped(failures: Array[String]) -> void:
 		failures.append("controlled actor should be skipped after acting unit advances")
 
 func _test_player_party_has_front_row_pets(failures: Array[String]) -> void:
-	var units := BattleData.create_combatants()
-	var player_characters := 0
-	var player_pets := 0
-	for unit in units:
-		if unit.team != BattleConstants.Team.PLAYER:
+	var counts := _count_team(BattleConstants.Team.PLAYER)
+	if counts["characters"] != 5:
+		failures.append("player party should keep five characters")
+	if counts["pets"] != 5:
+		failures.append("player party should add one pet per character")
+
+func _test_enemy_party_supports_ten_units(failures: Array[String]) -> void:
+	var counts := _count_team(BattleConstants.Team.ENEMY)
+	if counts["characters"] != 5:
+		failures.append("enemy party should keep five characters")
+	if counts["pets"] != 5:
+		failures.append("enemy party should support five pets")
+
+func _count_team(team: BattleConstants.Team) -> Dictionary:
+	var counts := {"characters": 0, "pets": 0}
+	for unit in BattleData.create_combatants():
+		if unit.team != team:
 			continue
 		if unit.unit_type == BattleConstants.UnitType.CHARACTER:
-			player_characters += 1
+			counts["characters"] += 1
 		elif unit.unit_type == BattleConstants.UnitType.PET:
-			player_pets += 1
+			counts["pets"] += 1
 			if unit.skills.size() < 4:
-				failures.append("pet should expose attack, defense, active skill, and support skill")
-	if player_characters != 5:
-		failures.append("player party should keep five characters")
-	if player_pets != 5:
-		failures.append("player party should add one pet per character")
+				counts["pets"] = -99
+	return counts

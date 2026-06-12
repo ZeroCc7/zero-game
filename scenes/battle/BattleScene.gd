@@ -151,26 +151,35 @@ func _unit_at_position(screen_position: Vector2) -> Combatant:
 
 func _position_for(unit: Combatant) -> Vector2:
 	var enemy_positions := [
-		Vector2(430, 285),
-		Vector2(625, 250),
-		Vector2(820, 230),
-		Vector2(1015, 250),
-		Vector2(1210, 285)
+		Vector2(500, 245),
+		Vector2(690, 210),
+		Vector2(880, 195),
+		Vector2(1070, 210),
+		Vector2(1260, 245)
+	]
+	var enemy_pet_positions := [
+		Vector2(545, 405),
+		Vector2(735, 370),
+		Vector2(925, 355),
+		Vector2(1115, 370),
+		Vector2(1305, 405)
 	]
 	var player_positions := [
-		Vector2(790, 735),
-		Vector2(970, 695),
-		Vector2(1150, 695),
-		Vector2(1330, 735),
-		Vector2(1510, 695)
+		Vector2(720, 815),
+		Vector2(910, 780),
+		Vector2(1100, 765),
+		Vector2(1290, 780),
+		Vector2(1480, 815)
 	]
 	var pet_positions := [
-		Vector2(720, 610),
-		Vector2(920, 570),
-		Vector2(1120, 570),
-		Vector2(1320, 610),
-		Vector2(1520, 570)
+		Vector2(675, 650),
+		Vector2(865, 615),
+		Vector2(1055, 600),
+		Vector2(1245, 615),
+		Vector2(1435, 650)
 	]
 	if unit.team == BattleConstants.Team.PLAYER and unit.unit_type == BattleConstants.UnitType.PET:
 		return pet_positions[unit.position_index]
+	if unit.team == BattleConstants.Team.ENEMY and unit.unit_type == BattleConstants.UnitType.PET:
+		return enemy_pet_positions[unit.position_index]
 	return player_positions[unit.position_index] if unit.team == BattleConstants.Team.PLAYER else enemy_positions[unit.position_index]
