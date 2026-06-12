@@ -22,7 +22,7 @@ func _ready() -> void:
 func bind(p_combatant: Combatant) -> void:
 	combatant = p_combatant
 	last_hp = combatant.hp
-	base_scale = Vector2(0.82, 0.82) if combatant.unit_type == BattleConstants.UnitType.PET else Vector2.ONE
+	base_scale = Vector2(0.68, 0.68) if combatant.unit_type == BattleConstants.UnitType.PET else Vector2(0.82, 0.82)
 	scale = base_scale
 	_update_static_colors()
 	refresh()
