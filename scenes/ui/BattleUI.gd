@@ -6,11 +6,9 @@ signal end_turn_requested
 const GOLD := Color(0.92, 0.70, 0.36, 1.0)
 const PALE_GOLD := Color(1.0, 0.88, 0.58, 1.0)
 const DARK_PANEL := Color(0.05, 0.045, 0.04, 0.86)
-const DEEP_PANEL := Color(0.025, 0.022, 0.02, 0.92)
 
 var current_actor: Combatant
 var skill_buttons: Array[Button] = []
-var turn_badges: Array[Label] = []
 var selected_skill: Skill
 
 @onready var round_label: Label = $TopInfoPanel/RoundLabel
@@ -19,7 +17,6 @@ var selected_skill: Skill
 @onready var current_hp: ProgressBar = $BottomHud/ActorPanel/CurrentHp
 @onready var current_resource: ProgressBar = $BottomHud/ActorPanel/CurrentResource
 @onready var portrait_label: Label = $BottomHud/ActorPanel/PortraitFrame/PortraitLabel
-@onready var skill_bar: HBoxContainer = $BottomHud/SkillBar
 @onready var end_turn_button: Button = $BottomHud/EndTurnButton
 @onready var result_label: Label = $ResultLabel
 @onready var target_hint: Label = $CenterPrompt/TargetHint
@@ -45,7 +42,7 @@ func _ready() -> void:
 func bind_actor(actor: Combatant) -> void:
 	current_actor = actor
 	current_name.text = actor.display_name
-	portrait_label.text = actor.display_name.substr(0, 1)
+	portrait_label.text = _badge_text(actor)
 	current_hp.max_value = actor.max_hp
 	current_hp.value = actor.hp
 	current_resource.max_value = actor.max_resource
@@ -59,12 +56,24 @@ func bind_actor(actor: Combatant) -> void:
 	clear_selected_skill()
 
 func set_round(round_number: int) -> void:
-	round_label.text = "回合 %d/20" % round_number
-	round_plate.text = "第 %d 回合" % round_number
-	condition_label.text = "胜利条件：击败敌方所有单位"
+	round_label.text = "Round %d/20" % round_number
+	round_plate.text = "Round %d" % round_number
+	condition_label.text = "Win: defeat all enemy units"
+
+func set_turn_order(turn_queue: Array[Combatant]) -> void:
+	for child in turn_track.get_children():
+		child.queue_free()
+	var shown := 0
+	for unit in turn_queue:
+		if unit == null or not unit.is_alive():
+			continue
+		turn_track.add_child(_create_turn_badge(unit, shown == 0))
+		shown += 1
+		if shown >= 14:
+			break
 
 func show_result(winner_team: BattleConstants.Team) -> void:
-	result_label.text = "胜利" if winner_team == BattleConstants.Team.PLAYER else "失败"
+	result_label.text = "VICTORY" if winner_team == BattleConstants.Team.PLAYER else "DEFEAT"
 	result_label.visible = true
 	target_hint.visible = false
 	for button in skill_buttons:
@@ -73,7 +82,7 @@ func show_result(winner_team: BattleConstants.Team) -> void:
 
 func set_selected_skill(skill: Skill) -> void:
 	selected_skill = skill
-	target_hint.text = "选择目标：%s" % skill.display_name
+	target_hint.text = "Select target: %s" % skill.display_name
 	target_hint.visible = true
 	for index in range(skill_buttons.size()):
 		var button := skill_buttons[index]
@@ -86,27 +95,41 @@ func clear_selected_skill() -> void:
 		button.modulate = Color.WHITE
 
 func show_action(actor: Combatant, skill: Skill, affected_count: int) -> void:
-	action_log.text = "%s 使用 %s，命中 %d 个目标" % [actor.display_name, skill.display_name, affected_count]
-	_refresh_turn_track()
+	action_log.text = "%s used %s, hit %d target(s)" % [actor.display_name, skill.display_name, affected_count]
 
-func _refresh_turn_track() -> void:
-	for child in turn_track.get_children():
-		child.queue_free()
-	var root := current_actor
-	if root == null:
-		return
+func _create_turn_badge(unit: Combatant, is_current: bool) -> Control:
+	var holder := VBoxContainer.new()
+	holder.custom_minimum_size = Vector2(58, 50)
+	holder.add_theme_constant_override("separation", 1)
+
 	var badge := Label.new()
-	badge.custom_minimum_size = Vector2(54, 44)
-	badge.text = root.display_name.substr(0, 1)
+	badge.custom_minimum_size = Vector2(52, 34)
+	badge.text = _badge_text(unit)
 	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	badge.add_theme_color_override("font_color", PALE_GOLD)
-	badge.add_theme_font_size_override("font_size", 24)
-	badge.add_theme_stylebox_override("normal", _box(Color(0.10, 0.08, 0.045, 0.96), GOLD, 2, 22))
-	turn_track.add_child(badge)
+	badge.add_theme_color_override("font_color", PALE_GOLD if unit.team == BattleConstants.Team.PLAYER else Color(1.0, 0.58, 0.48, 1.0))
+	badge.add_theme_font_size_override("font_size", 18 if unit.unit_type == BattleConstants.UnitType.PET else 22)
+	var fill := Color(0.10, 0.08, 0.045, 0.96) if unit.team == BattleConstants.Team.PLAYER else Color(0.13, 0.035, 0.025, 0.96)
+	var border := PALE_GOLD if is_current else (Color(0.35, 0.58, 0.95, 1.0) if unit.team == BattleConstants.Team.PLAYER else Color(0.85, 0.24, 0.18, 1.0))
+	badge.add_theme_stylebox_override("normal", _box(fill, border, 2 if is_current else 1, 18))
+	holder.add_child(badge)
+
+	var type_label := Label.new()
+	type_label.custom_minimum_size = Vector2(52, 12)
+	type_label.text = "PET" if unit.unit_type == BattleConstants.UnitType.PET else "UNIT"
+	type_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	type_label.add_theme_color_override("font_color", Color(0.74, 0.63, 0.42, 1.0))
+	type_label.add_theme_font_size_override("font_size", 9)
+	holder.add_child(type_label)
+	return holder
+
+func _badge_text(unit: Combatant) -> String:
+	if unit.team == BattleConstants.Team.PLAYER:
+		return "P" if unit.unit_type == BattleConstants.UnitType.CHARACTER else "Pet"
+	return "E" if unit.unit_type == BattleConstants.UnitType.CHARACTER else "Beast"
 
 func _style_panels() -> void:
-	for panel_path in ["TopInfoPanel", "BottomHud", "BottomHud/ActorPanel", "CenterPrompt"]:
+	for panel_path in ["TopInfoPanel", "BottomHud", "BottomHud/ActorPanel", "CenterPrompt", "BottomHud/ActorPanel/PortraitFrame"]:
 		var panel := get_node(panel_path) as Control
 		panel.add_theme_stylebox_override("panel", _box(DARK_PANEL, Color(0.55, 0.38, 0.18, 0.95), 2, 4))
 	round_label.add_theme_color_override("font_color", PALE_GOLD)
@@ -114,6 +137,7 @@ func _style_panels() -> void:
 	current_name.add_theme_color_override("font_color", PALE_GOLD)
 	action_log.add_theme_color_override("font_color", Color(0.95, 0.84, 0.62, 1.0))
 	target_hint.add_theme_color_override("font_color", PALE_GOLD)
+	round_plate.add_theme_color_override("font_color", PALE_GOLD)
 
 func _style_buttons() -> void:
 	for button in skill_buttons:

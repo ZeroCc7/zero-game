@@ -38,6 +38,7 @@ func _on_actor_changed(actor: Combatant) -> void:
 		return
 	battle_ui.set_round(controller.round_number)
 	battle_ui.bind_actor(actor)
+	battle_ui.set_turn_order(controller.turn_queue)
 	for unit_id in combatant_views:
 		var view = combatant_views[unit_id]
 		view.refresh()
