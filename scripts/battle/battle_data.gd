@@ -6,17 +6,17 @@ static func create_combatants() -> Array[Combatant]:
 	var enemy_skills: Dictionary = _create_enemy_skills()
 	var units: Array[Combatant] = []
 
-	units.append(Combatant.new("player_gold", "金阙剑修", BattleConstants.Team.PLAYER, BattleConstants.Element.GOLD, 68, 15236, 100, 820, 880, 420, 75, player_skills["gold"], 0))
-	units.append(Combatant.new("player_wood", "青木医师", BattleConstants.Team.PLAYER, BattleConstants.Element.WOOD, 68, 13390, 100, 520, 760, 460, 66, player_skills["wood"], 1))
-	units.append(Combatant.new("player_water", "玄水术士", BattleConstants.Team.PLAYER, BattleConstants.Element.WATER, 68, 14561, 100, 480, 740, 720, 58, player_skills["water"], 2))
-	units.append(Combatant.new("player_fire", "赤焰道君", BattleConstants.Team.PLAYER, BattleConstants.Element.FIRE, 68, 13980, 100, 560, 920, 390, 92, player_skills["fire"], 3))
-	units.append(Combatant.new("player_earth", "厚土武尊", BattleConstants.Team.PLAYER, BattleConstants.Element.EARTH, 68, 15236, 100, 760, 520, 760, 52, player_skills["earth"], 4))
+	units.append(Combatant.new("player_gold", "金阙剑修", BattleConstants.Team.PLAYER, BattleConstants.Element.GOLD, 68, 15236, 100, 820, 880, 420, 75, _typed_skills(player_skills, "gold"), 0))
+	units.append(Combatant.new("player_wood", "青木医师", BattleConstants.Team.PLAYER, BattleConstants.Element.WOOD, 68, 13390, 100, 520, 760, 460, 66, _typed_skills(player_skills, "wood"), 1))
+	units.append(Combatant.new("player_water", "玄水术士", BattleConstants.Team.PLAYER, BattleConstants.Element.WATER, 68, 14561, 100, 480, 740, 720, 58, _typed_skills(player_skills, "water"), 2))
+	units.append(Combatant.new("player_fire", "赤焰道君", BattleConstants.Team.PLAYER, BattleConstants.Element.FIRE, 68, 13980, 100, 560, 920, 390, 92, _typed_skills(player_skills, "fire"), 3))
+	units.append(Combatant.new("player_earth", "厚土武尊", BattleConstants.Team.PLAYER, BattleConstants.Element.EARTH, 68, 15236, 100, 760, 520, 760, 52, _typed_skills(player_skills, "earth"), 4))
 
-	units.append(Combatant.new("enemy_gold", "断金剑客", BattleConstants.Team.ENEMY, BattleConstants.Element.GOLD, 68, 14589, 100, 760, 780, 400, 70, enemy_skills["gold"], 0))
-	units.append(Combatant.new("enemy_wood", "腐木咒师", BattleConstants.Team.ENEMY, BattleConstants.Element.WOOD, 68, 13852, 100, 500, 720, 430, 62, enemy_skills["wood"], 1))
-	units.append(Combatant.new("enemy_water", "幽冥巫师", BattleConstants.Team.ENEMY, BattleConstants.Element.WATER, 68, 14226, 100, 460, 700, 690, 56, enemy_skills["water"], 2))
-	units.append(Combatant.new("enemy_fire", "黑焰狂徒", BattleConstants.Team.ENEMY, BattleConstants.Element.FIRE, 68, 14127, 100, 540, 860, 380, 88, enemy_skills["fire"], 3))
-	units.append(Combatant.new("enemy_earth", "岩甲兽灵", BattleConstants.Team.ENEMY, BattleConstants.Element.EARTH, 68, 15236, 100, 720, 480, 740, 50, enemy_skills["earth"], 4))
+	units.append(Combatant.new("enemy_gold", "断金剑客", BattleConstants.Team.ENEMY, BattleConstants.Element.GOLD, 68, 14589, 100, 760, 780, 400, 70, _typed_skills(enemy_skills, "gold"), 0))
+	units.append(Combatant.new("enemy_wood", "腐木咒师", BattleConstants.Team.ENEMY, BattleConstants.Element.WOOD, 68, 13852, 100, 500, 720, 430, 62, _typed_skills(enemy_skills, "wood"), 1))
+	units.append(Combatant.new("enemy_water", "幽冥巫师", BattleConstants.Team.ENEMY, BattleConstants.Element.WATER, 68, 14226, 100, 460, 700, 690, 56, _typed_skills(enemy_skills, "water"), 2))
+	units.append(Combatant.new("enemy_fire", "黑焰狂徒", BattleConstants.Team.ENEMY, BattleConstants.Element.FIRE, 68, 14127, 100, 540, 860, 380, 88, _typed_skills(enemy_skills, "fire"), 3))
+	units.append(Combatant.new("enemy_earth", "岩甲兽灵", BattleConstants.Team.ENEMY, BattleConstants.Element.EARTH, 68, 15236, 100, 720, 480, 740, 50, _typed_skills(enemy_skills, "earth"), 4))
 
 	return units
 
@@ -60,3 +60,9 @@ static func _create_enemy_skills() -> Dictionary:
 
 static func _common_physical() -> Skill:
 	return Skill.new("common_cleave", "裂阵千锋", BattleConstants.Element.NONE, BattleConstants.SkillKind.PHYSICAL, 0, BattleConstants.TargetRule.MULTI_ENEMY, 135, 2, -1, 0.0, 0, "物理群攻")
+
+static func _typed_skills(skill_sets: Dictionary, key: String) -> Array[Skill]:
+	var typed: Array[Skill] = []
+	for skill in skill_sets[key]:
+		typed.append(skill)
+	return typed
