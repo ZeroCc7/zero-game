@@ -1,0 +1,7 @@
+2D sprite animation sheet, 2 columns x 2 rows, 4 frames.
+Gold sect male swordsman hero, player-side unit.
+Dark Chinese wuxia fantasy, semi-realistic painted sprite.
+3/4 top-down tactical view from behind, back-facing to viewer, facing upward toward enemies.
+White and black robes, antique gold armor trim, long black hair, sword held close, subtle golden aura.
+Idle breathing loop only, stable feet anchor, consistent scale.
+Solid pure magenta #FF00FF background, no UI, no text, no frame borders.

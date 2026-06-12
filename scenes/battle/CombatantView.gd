@@ -1,5 +1,18 @@
 extends Node2D
 
+const PLAYER_GOLD_IDLE_FRAMES := [
+	"res://assets/art/units/gold_swordsman/idle/gold_swordsman_idle-1.png",
+	"res://assets/art/units/gold_swordsman/idle/gold_swordsman_idle-2.png",
+	"res://assets/art/units/gold_swordsman/idle/gold_swordsman_idle-3.png",
+	"res://assets/art/units/gold_swordsman/idle/gold_swordsman_idle-4.png"
+]
+const PET_GOLD_IDLE_FRAMES := [
+	"res://assets/art/units/gold_lion_pet/idle/gold_lion_pet_idle-1.png",
+	"res://assets/art/units/gold_lion_pet/idle/gold_lion_pet_idle-2.png",
+	"res://assets/art/units/gold_lion_pet/idle/gold_lion_pet_idle-3.png",
+	"res://assets/art/units/gold_lion_pet/idle/gold_lion_pet_idle-4.png"
+]
+
 var combatant: Combatant
 var last_hp: int = -1
 var base_scale := Vector2.ONE
@@ -7,6 +20,7 @@ var base_scale := Vector2.ONE
 @onready var click_area: Area2D = $ClickArea
 @onready var ring: ColorRect = $Ring
 @onready var body: ColorRect = $Body
+@onready var sprite: AnimatedSprite2D = $Sprite
 @onready var name_label: Label = $NameLabel
 @onready var hp_bar: ProgressBar = $HpBar
 @onready var hp_value_label: Label = $HpBar/HpValueLabel
@@ -25,6 +39,7 @@ func bind(p_combatant: Combatant) -> void:
 	base_scale = Vector2(0.68, 0.68) if combatant.unit_type == BattleConstants.UnitType.PET else Vector2(0.82, 0.82)
 	scale = base_scale
 	_update_static_colors()
+	_apply_unit_sprite()
 	refresh()
 
 func refresh() -> void:
@@ -61,11 +76,13 @@ func _show_damage(amount: int) -> void:
 	damage_label.modulate = Color(1.0, 0.16, 0.08, 1.0)
 	damage_label.position = Vector2(-58, -150)
 	body.modulate = Color(1.8, 1.8, 1.8, 1.0)
+	sprite.modulate = Color(1.8, 1.8, 1.8, 1.0)
 	var tween := create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(damage_label, "position", Vector2(-58, -190), 0.55)
 	tween.tween_property(damage_label, "modulate:a", 0.0, 0.55)
 	tween.tween_property(body, "modulate", Color.WHITE, 0.22)
+	tween.tween_property(sprite, "modulate", Color.WHITE, 0.22)
 	tween.finished.connect(func() -> void: damage_label.visible = false)
 
 func _apply_bar_style(bar: ProgressBar, fill_color: Color, background_color: Color) -> void:
@@ -101,3 +118,36 @@ func _update_static_colors() -> void:
 			body.color = Color(0.90, 0.25, 0.15, 1.0)
 		BattleConstants.Element.EARTH:
 			body.color = Color(0.65, 0.48, 0.25, 1.0)
+
+func _apply_unit_sprite() -> void:
+	var frame_paths := _sprite_frame_paths()
+	if frame_paths.is_empty():
+		sprite.visible = false
+		body.visible = true
+		return
+
+	var frames := SpriteFrames.new()
+	frames.add_animation("idle")
+	frames.set_animation_loop("idle", true)
+	frames.set_animation_speed("idle", 5.0)
+
+	for path in frame_paths:
+		var texture := load(path) as Texture2D
+		if texture == null:
+			sprite.visible = false
+			body.visible = true
+			return
+		frames.add_frame("idle", texture)
+
+	sprite.sprite_frames = frames
+	sprite.animation = "idle"
+	sprite.visible = true
+	body.visible = false
+	sprite.play("idle")
+
+func _sprite_frame_paths() -> Array:
+	if combatant.id == "player_gold":
+		return PLAYER_GOLD_IDLE_FRAMES
+	if combatant.id == "pet_gold":
+		return PET_GOLD_IDLE_FRAMES
+	return []
