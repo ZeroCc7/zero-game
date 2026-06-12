@@ -5,6 +5,7 @@ signal end_turn_requested
 
 var current_actor: Combatant
 var skill_buttons: Array[Button] = []
+var selected_skill: Skill
 
 @onready var round_label: Label = $TopPanel/RoundLabel
 @onready var current_name: Label = $CurrentPanel/CurrentName
@@ -12,6 +13,7 @@ var skill_buttons: Array[Button] = []
 @onready var current_resource: ProgressBar = $CurrentPanel/CurrentResource
 @onready var end_turn_button: Button = $EndTurnButton
 @onready var result_label: Label = $ResultLabel
+@onready var target_hint: Label = $TargetHint
 
 func _ready() -> void:
 	skill_buttons = [$SkillBar/Skill0, $SkillBar/Skill1, $SkillBar/Skill2, $SkillBar/Skill3]
@@ -31,6 +33,7 @@ func bind_actor(actor: Combatant) -> void:
 		var skill := actor.skills[index]
 		button.text = "%s\n%d" % [skill.display_name, skill.cost]
 		button.disabled = actor.resource < skill.cost or actor.team != BattleConstants.Team.PLAYER
+	clear_selected_skill()
 
 func set_round(round_number: int) -> void:
 	round_label.text = "回合 %d" % round_number
@@ -38,9 +41,24 @@ func set_round(round_number: int) -> void:
 func show_result(winner_team: BattleConstants.Team) -> void:
 	result_label.text = "胜利" if winner_team == BattleConstants.Team.PLAYER else "失败"
 	result_label.visible = true
+	target_hint.visible = false
 	for button in skill_buttons:
 		button.disabled = true
 	end_turn_button.disabled = true
+
+func set_selected_skill(skill: Skill) -> void:
+	selected_skill = skill
+	target_hint.text = "已选择：%s，点击敌方目标" % skill.display_name
+	target_hint.visible = true
+	for index in range(skill_buttons.size()):
+		var button := skill_buttons[index]
+		button.modulate = Color(1.0, 0.82, 0.32, 1.0) if current_actor.skills[index] == skill else Color.WHITE
+
+func clear_selected_skill() -> void:
+	selected_skill = null
+	target_hint.visible = false
+	for button in skill_buttons:
+		button.modulate = Color.WHITE
 
 func _on_skill_pressed(index: int) -> void:
 	if current_actor == null:

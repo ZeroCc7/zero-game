@@ -56,6 +56,19 @@ func _on_skill_selected(skill: Skill) -> void:
 		selected_skill = null
 		return
 	selected_skill = skill
+	battle_ui.set_selected_skill(skill)
+
+func _input(event: InputEvent) -> void:
+	if selected_skill == null:
+		return
+	if not event is InputEventMouseButton:
+		return
+	if not event.pressed or event.button_index != MOUSE_BUTTON_LEFT:
+		return
+	var target := _unit_at_position(get_global_mouse_position())
+	if target == null:
+		return
+	_use_selected_skill_on(target)
 
 func _on_unit_input(_viewport, event: InputEvent, _shape_idx: int, target: Combatant) -> void:
 	if selected_skill == null:
@@ -64,12 +77,18 @@ func _on_unit_input(_viewport, event: InputEvent, _shape_idx: int, target: Comba
 		return
 	if not event.pressed or event.button_index != MOUSE_BUTTON_LEFT:
 		return
+	_use_selected_skill_on(target)
+
+func _use_selected_skill_on(target: Combatant) -> void:
 	var actor := controller.current_actor()
 	if actor == null or actor.team != BattleConstants.Team.PLAYER:
+		return
+	if target.team == actor.team or not target.is_alive():
 		return
 	var targets := _targets_for_skill(actor, selected_skill, target)
 	controller.player_use_skill(selected_skill, targets)
 	selected_skill = null
+	battle_ui.clear_selected_skill()
 
 func _on_end_turn_requested() -> void:
 	var actor := controller.current_actor()
@@ -90,7 +109,7 @@ func _on_battle_finished(winner_team: BattleConstants.Team) -> void:
 func _targets_for_skill(actor: Combatant, skill: Skill, clicked_target: Combatant) -> Array:
 	match skill.target_rule:
 		BattleConstants.TargetRule.MULTI_ENEMY:
-			return _living_enemies(actor).slice(0, skill.max_targets)
+			return _ordered_targets(clicked_target, _living_enemies(actor)).slice(0, skill.max_targets)
 		BattleConstants.TargetRule.ALL_ENEMIES:
 			return _living_enemies(actor)
 		BattleConstants.TargetRule.MULTI_ALLY:
@@ -107,6 +126,27 @@ func _living_enemies(actor: Combatant) -> Array:
 
 func _living_allies(actor: Combatant) -> Array:
 	return controller.units.filter(func(unit: Combatant) -> bool: return unit.team == actor.team and unit.is_alive())
+
+func _ordered_targets(primary: Combatant, candidates: Array) -> Array:
+	var ordered := []
+	if primary != null and candidates.has(primary):
+		ordered.append(primary)
+	for candidate in candidates:
+		if candidate != primary:
+			ordered.append(candidate)
+	return ordered
+
+func _unit_at_position(screen_position: Vector2) -> Combatant:
+	for unit_id in combatant_views:
+		var view = combatant_views[unit_id]
+		if view.combatant == null or not view.combatant.is_alive():
+			continue
+		if view.combatant.team != BattleConstants.Team.ENEMY:
+			continue
+		var local_position: Vector2 = view.to_local(screen_position)
+		if Rect2(Vector2(-70, -105), Vector2(140, 185)).has_point(local_position):
+			return view.combatant
+	return null
 
 func _position_for(unit: Combatant) -> Vector2:
 	var enemy_positions := [
