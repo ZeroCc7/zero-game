@@ -128,14 +128,15 @@ func _badge_text(unit: Combatant) -> String:
 
 func _style_panels() -> void:
 	for panel_path in ["TopInfoPanel", "LeftLogPanel", "BottomHud", "BottomHud/ActorPanel", "BottomHud/ActorPanel/PortraitFrame"]:
-		var panel := get_node(panel_path) as Control
-		panel.add_theme_stylebox_override("panel", _box(DARK_PANEL, Color(0.55, 0.38, 0.18, 0.95), 2, 4))
-	round_label.add_theme_color_override("font_color", PALE_GOLD)
-	condition_label.add_theme_color_override("font_color", Color(0.94, 0.84, 0.62, 1.0))
-	current_name.add_theme_color_override("font_color", PALE_GOLD)
-	action_log.add_theme_color_override("font_color", Color(0.95, 0.84, 0.62, 1.0))
-	target_hint.add_theme_color_override("font_color", PALE_GOLD)
-	round_plate.add_theme_color_override("font_color", PALE_GOLD)
+		var panel := get_node_or_null(panel_path) as Control
+		if panel != null:
+			panel.add_theme_stylebox_override("panel", _box(DARK_PANEL, Color(0.55, 0.38, 0.18, 0.95), 2, 4))
+	_set_label_color(round_label, PALE_GOLD)
+	_set_label_color(condition_label, Color(0.94, 0.84, 0.62, 1.0))
+	_set_label_color(current_name, PALE_GOLD)
+	_set_label_color(action_log, Color(0.95, 0.84, 0.62, 1.0))
+	_set_label_color(target_hint, PALE_GOLD)
+	_set_label_color(round_plate, PALE_GOLD)
 
 func _style_buttons() -> void:
 	for button in skill_buttons:
@@ -149,11 +150,17 @@ func _style_buttons() -> void:
 	end_turn_button.add_theme_color_override("font_color", PALE_GOLD)
 	end_turn_button.add_theme_font_size_override("font_size", 38)
 	for path in ["TopRightButtons/SettingsButton", "TopRightButtons/SpeedButton", "TopRightButtons/AutoButton", "TopRightButtons/MenuButton", "BottomHud/ItemButton"]:
-		var button := get_node(path) as Button
+		var button := get_node_or_null(path) as Button
+		if button == null:
+			continue
 		button.add_theme_stylebox_override("normal", _box(Color(0.035, 0.03, 0.025, 0.94), Color(0.64, 0.44, 0.20, 1.0), 2, 28))
 		button.add_theme_stylebox_override("hover", _box(Color(0.12, 0.08, 0.04, 0.98), PALE_GOLD, 2, 28))
 		button.add_theme_color_override("font_color", PALE_GOLD)
 		button.add_theme_font_size_override("font_size", 20)
+
+func _set_label_color(label: Label, color: Color) -> void:
+	if label != null:
+		label.add_theme_color_override("font_color", color)
 
 func _apply_bar_style(bar: ProgressBar, fill_color: Color, background_color: Color) -> void:
 	bar.add_theme_stylebox_override("fill", _box(fill_color, Color.TRANSPARENT, 0, 4))
