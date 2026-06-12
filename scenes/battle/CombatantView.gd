@@ -153,6 +153,7 @@ func _apply_unit_sprite() -> void:
 
 	sprite.sprite_frames = frames
 	sprite.animation = "idle"
+	sprite.scale = Vector2(1.7, 1.7) if combatant.unit_type == BattleConstants.UnitType.PET else Vector2(2.0, 2.0)
 	sprite.visible = true
 	body.visible = false
 	sprite.play("idle")
