@@ -51,6 +51,7 @@ func bind_actor(actor: Combatant) -> void:
 		var button := skill_buttons[index]
 		var skill := actor.skills[index]
 		button.text = "%s\n%d" % [skill.display_name, skill.cost]
+		button.tooltip_text = _skill_tooltip(skill)
 		button.disabled = actor.resource < skill.cost or actor.team != BattleConstants.Team.PLAYER
 		button.modulate = Color.WHITE
 	clear_selected_skill()
@@ -179,6 +180,96 @@ func _box(fill: Color, border: Color, border_width: int, radius: int) -> StyleBo
 	style.corner_radius_bottom_left = radius
 	style.corner_radius_bottom_right = radius
 	return style
+
+func _skill_tooltip(skill: Skill) -> String:
+	var lines: Array[String] = []
+	lines.append(skill.display_name)
+	lines.append("消耗：%d 内力" % skill.cost)
+	lines.append("类型：%s" % _skill_kind_text(skill.kind))
+	lines.append("目标：%s，最多 %d 个" % [_target_rule_text(skill.target_rule), skill.max_targets])
+	if skill.power > 0:
+		lines.append("威力：%d" % skill.power)
+	if skill.status_kind >= 0:
+		lines.append("效果：%s，持续 %d 回合" % [_status_kind_text(skill.status_kind), skill.status_duration])
+	if skill.description != "":
+		lines.append(skill.description)
+	else:
+		lines.append(_default_skill_description(skill))
+	return "\n".join(lines)
+
+func _skill_kind_text(kind: BattleConstants.SkillKind) -> String:
+	match kind:
+		BattleConstants.SkillKind.PHYSICAL:
+			return "物理"
+		BattleConstants.SkillKind.SPELL:
+			return "法术"
+		BattleConstants.SkillKind.OBSTACLE:
+			return "障碍"
+		BattleConstants.SkillKind.SUPPORT:
+			return "辅助"
+		BattleConstants.SkillKind.ULTIMATE:
+			return "大招"
+		_:
+			return "技能"
+
+func _target_rule_text(rule: BattleConstants.TargetRule) -> String:
+	match rule:
+		BattleConstants.TargetRule.SINGLE_ENEMY:
+			return "单个敌方"
+		BattleConstants.TargetRule.MULTI_ENEMY:
+			return "多个敌方"
+		BattleConstants.TargetRule.SINGLE_ALLY:
+			return "单个己方"
+		BattleConstants.TargetRule.MULTI_ALLY:
+			return "多个己方"
+		BattleConstants.TargetRule.SELF:
+			return "自身"
+		BattleConstants.TargetRule.ALL_ENEMIES:
+			return "全体敌方"
+		BattleConstants.TargetRule.ALL_ALLIES:
+			return "全体己方"
+		_:
+			return "目标"
+
+func _status_kind_text(kind: int) -> String:
+	match kind:
+		BattleConstants.StatusKind.FORGET:
+			return "遗忘"
+		BattleConstants.StatusKind.POISON:
+			return "中毒"
+		BattleConstants.StatusKind.FREEZE:
+			return "冰冻"
+		BattleConstants.StatusKind.SLEEP_LOCK:
+			return "锁灵"
+		BattleConstants.StatusKind.CONFUSION:
+			return "混乱"
+		BattleConstants.StatusKind.ATTACK_UP:
+			return "提升攻击"
+		BattleConstants.StatusKind.REGEN:
+			return "持续回血"
+		BattleConstants.StatusKind.DEFENSE_UP:
+			return "提升防御"
+		BattleConstants.StatusKind.SPEED_UP:
+			return "提升速度"
+		BattleConstants.StatusKind.DODGE_UP:
+			return "提升闪避"
+		_:
+			return "状态"
+
+func _default_skill_description(skill: Skill) -> String:
+	match skill.kind:
+		BattleConstants.SkillKind.PHYSICAL:
+			return "对目标造成物理伤害。"
+		BattleConstants.SkillKind.SPELL:
+			return "对目标造成五行法术伤害。"
+		BattleConstants.SkillKind.OBSTACLE:
+			return "尝试给目标施加障碍状态。"
+		BattleConstants.SkillKind.SUPPORT:
+			return "为己方提供增益或恢复效果。"
+		BattleConstants.SkillKind.ULTIMATE:
+			return "消耗较高，造成强力伤害。"
+		_:
+			return "战斗技能。"
 
 func _on_skill_pressed(index: int) -> void:
 	if current_actor == null:
