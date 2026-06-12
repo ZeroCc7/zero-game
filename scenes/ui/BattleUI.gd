@@ -19,7 +19,7 @@ var selected_skill: Skill
 @onready var portrait_label: Label = $BottomHud/ActorPanel/PortraitFrame/PortraitLabel
 @onready var end_turn_button: Button = $BottomHud/EndTurnButton
 @onready var result_label: Label = $ResultLabel
-@onready var target_hint: Label = $CenterPrompt/TargetHint
+@onready var target_hint: Label = $BottomHud/TargetHint
 @onready var action_log: Label = $LeftLogPanel/ActionLog
 @onready var turn_track: HBoxContainer = $BottomHud/TurnTrack
 @onready var round_plate: Label = $BottomHud/RoundPlate
@@ -82,7 +82,7 @@ func show_result(winner_team: BattleConstants.Team) -> void:
 
 func set_selected_skill(skill: Skill) -> void:
 	selected_skill = skill
-	target_hint.text = "选择目标：%s" % skill.display_name
+	target_hint.text = "已选择「%s」，点击敌方目标" % skill.display_name
 	target_hint.visible = true
 	for index in range(skill_buttons.size()):
 		var button := skill_buttons[index]
@@ -101,7 +101,6 @@ func _create_turn_badge(unit: Combatant, is_current: bool) -> Control:
 	var holder := VBoxContainer.new()
 	holder.custom_minimum_size = Vector2(58, 50)
 	holder.add_theme_constant_override("separation", 1)
-
 	var badge := Label.new()
 	badge.custom_minimum_size = Vector2(52, 34)
 	badge.text = _badge_text(unit)
@@ -113,7 +112,6 @@ func _create_turn_badge(unit: Combatant, is_current: bool) -> Control:
 	var border := PALE_GOLD if is_current else (Color(0.35, 0.58, 0.95, 1.0) if unit.team == BattleConstants.Team.PLAYER else Color(0.85, 0.24, 0.18, 1.0))
 	badge.add_theme_stylebox_override("normal", _box(fill, border, 2 if is_current else 1, 18))
 	holder.add_child(badge)
-
 	var type_label := Label.new()
 	type_label.custom_minimum_size = Vector2(52, 12)
 	type_label.text = "宠物" if unit.unit_type == BattleConstants.UnitType.PET else "角色"
@@ -129,7 +127,7 @@ func _badge_text(unit: Combatant) -> String:
 	return "敌" if unit.unit_type == BattleConstants.UnitType.CHARACTER else "兽"
 
 func _style_panels() -> void:
-	for panel_path in ["TopInfoPanel", "LeftLogPanel", "BottomHud", "BottomHud/ActorPanel", "CenterPrompt", "BottomHud/ActorPanel/PortraitFrame"]:
+	for panel_path in ["TopInfoPanel", "LeftLogPanel", "BottomHud", "BottomHud/ActorPanel", "BottomHud/ActorPanel/PortraitFrame"]:
 		var panel := get_node(panel_path) as Control
 		panel.add_theme_stylebox_override("panel", _box(DARK_PANEL, Color(0.55, 0.38, 0.18, 0.95), 2, 4))
 	round_label.add_theme_color_override("font_color", PALE_GOLD)

@@ -87,28 +87,22 @@ text = "自动"
 custom_minimum_size = Vector2(58, 58)
 text = "菜单"
 
-[node name="CenterPrompt" type="Panel" parent="."]
-offset_left = 720.0
-offset_top = 428.0
-offset_right = 1200.0
-offset_bottom = 548.0
-mouse_filter = 2
-
-[node name="TargetHint" type="Label" parent="CenterPrompt"]
-visible = false
-offset_left = 24.0
-offset_top = 40.0
-offset_right = 456.0
-offset_bottom = 80.0
-theme_override_font_sizes/font_size = 26
-text = "选择目标"
-horizontal_alignment = 1
-
 [node name="BottomHud" type="Panel" parent="."]
 offset_left = 42.0
 offset_top = 820.0
 offset_right = 1878.0
 offset_bottom = 1064.0
+
+[node name="TargetHint" type="Label" parent="BottomHud"]
+visible = false
+offset_left = 610.0
+offset_top = -42.0
+offset_right = 1210.0
+offset_bottom = -8.0
+theme_override_colors/font_color = Color(1, 0.88, 0.58, 1)
+theme_override_font_sizes/font_size = 24
+text = "选择目标"
+horizontal_alignment = 1
 
 [node name="ActorPanel" type="Panel" parent="BottomHud"]
 offset_left = 28.0
