@@ -1,26 +1,39 @@
 extends Node2D
 
 var combatant: Combatant
+var last_hp: int = -1
 
 @onready var click_area: Area2D = $ClickArea
 @onready var ring: ColorRect = $Ring
 @onready var body: ColorRect = $Body
 @onready var name_label: Label = $NameLabel
 @onready var hp_bar: ProgressBar = $HpBar
+@onready var hp_value_label: Label = $HpBar/HpValueLabel
 @onready var resource_bar: ProgressBar = $ResourceBar
 @onready var status_label: Label = $StatusLabel
+@onready var damage_label: Label = $DamageLabel
+
+func _ready() -> void:
+	_apply_bar_style(hp_bar, Color(0.72, 0.05, 0.04, 1.0), Color(0.12, 0.02, 0.02, 0.95))
+	_apply_bar_style(resource_bar, Color(0.08, 0.45, 0.95, 1.0), Color(0.02, 0.05, 0.12, 0.95))
+	damage_label.visible = false
 
 func bind(p_combatant: Combatant) -> void:
 	combatant = p_combatant
+	last_hp = combatant.hp
 	_update_static_colors()
 	refresh()
 
 func refresh() -> void:
 	if combatant == null:
 		return
+	var hp_delta := 0
+	if last_hp >= 0:
+		hp_delta = last_hp - combatant.hp
 	name_label.text = combatant.display_name
 	hp_bar.max_value = combatant.max_hp
 	hp_bar.value = combatant.hp
+	hp_value_label.text = "%d/%d" % [combatant.hp, combatant.max_hp]
 	resource_bar.max_value = combatant.max_resource
 	resource_bar.value = combatant.resource
 	visible = combatant.is_alive()
@@ -28,13 +41,45 @@ func refresh() -> void:
 	for status in combatant.statuses:
 		status_names.append(status.display_name)
 	status_label.text = " ".join(status_names)
+	if hp_delta > 0:
+		_show_damage(hp_delta)
+	last_hp = combatant.hp
 
 func set_active(is_active: bool) -> void:
 	scale = Vector2(1.12, 1.12) if is_active else Vector2.ONE
 
 func set_selectable(is_selectable: bool) -> void:
-	modulate = Color(1.25, 1.25, 1.25, 1.0) if is_selectable else Color.WHITE
+	modulate = Color(1.25, 1.16, 0.72, 1.0) if is_selectable else Color.WHITE
 	click_area.input_pickable = is_selectable
+
+func _show_damage(amount: int) -> void:
+	damage_label.text = "-%d" % amount
+	damage_label.visible = true
+	damage_label.modulate = Color(1.0, 0.16, 0.08, 1.0)
+	damage_label.position = Vector2(-58, -150)
+	body.modulate = Color(1.8, 1.8, 1.8, 1.0)
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(damage_label, "position", Vector2(-58, -190), 0.55)
+	tween.tween_property(damage_label, "modulate:a", 0.0, 0.55)
+	tween.tween_property(body, "modulate", Color.WHITE, 0.22)
+	tween.finished.connect(func() -> void: damage_label.visible = false)
+
+func _apply_bar_style(bar: ProgressBar, fill_color: Color, background_color: Color) -> void:
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = fill_color
+	fill.corner_radius_top_left = 3
+	fill.corner_radius_top_right = 3
+	fill.corner_radius_bottom_left = 3
+	fill.corner_radius_bottom_right = 3
+	var background := StyleBoxFlat.new()
+	background.bg_color = background_color
+	background.corner_radius_top_left = 3
+	background.corner_radius_top_right = 3
+	background.corner_radius_bottom_left = 3
+	background.corner_radius_bottom_right = 3
+	bar.add_theme_stylebox_override("fill", fill)
+	bar.add_theme_stylebox_override("background", background)
 
 func _update_static_colors() -> void:
 	if combatant.team == BattleConstants.Team.PLAYER:

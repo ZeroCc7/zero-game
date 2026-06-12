@@ -93,7 +93,6 @@ offset_left = 130.0
 offset_top = 72.0
 offset_right = 350.0
 offset_bottom = 94.0
-show_percentage = false
 
 [node name="CurrentResource" type="ProgressBar" parent="CurrentPanel"]
 offset_left = 130.0
@@ -135,6 +134,16 @@ offset_right = 1270.0
 offset_bottom = 830.0
 theme_override_colors/font_color = Color(1, 0.82, 0.32, 1)
 theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+
+[node name="ActionLog" type="Label" parent="."]
+offset_left = 620.0
+offset_top = 745.0
+offset_right = 1300.0
+offset_bottom = 782.0
+theme_override_colors/font_color = Color(0.95, 0.88, 0.68, 1)
+theme_override_font_sizes/font_size = 24
+text = "选择技能开始战斗"
 horizontal_alignment = 1
 
 [node name="EndTurnButton" type="Button" parent="."]

@@ -96,9 +96,10 @@ func _on_end_turn_requested() -> void:
 		return
 	controller.player_use_skill(actor.skills[0], _living_enemies(actor).slice(0, actor.skills[0].max_targets))
 
-func _on_skill_resolved(_actor: Combatant, _skill: Skill, _targets: Array, _result: Dictionary) -> void:
+func _on_skill_resolved(actor: Combatant, skill: Skill, _targets: Array, result: Dictionary) -> void:
 	for view in combatant_views.values():
 		view.refresh()
+	battle_ui.show_action(actor, skill, result.get("affected", []).size())
 
 func _on_battle_finished(winner_team: BattleConstants.Team) -> void:
 	selected_skill = null

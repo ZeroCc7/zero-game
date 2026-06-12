@@ -14,12 +14,15 @@ var selected_skill: Skill
 @onready var end_turn_button: Button = $EndTurnButton
 @onready var result_label: Label = $ResultLabel
 @onready var target_hint: Label = $TargetHint
+@onready var action_log: Label = $ActionLog
 
 func _ready() -> void:
 	skill_buttons = [$SkillBar/Skill0, $SkillBar/Skill1, $SkillBar/Skill2, $SkillBar/Skill3]
 	for index in range(skill_buttons.size()):
 		skill_buttons[index].pressed.connect(_on_skill_pressed.bind(index))
 	end_turn_button.pressed.connect(func() -> void: emit_signal("end_turn_requested"))
+	_apply_bar_style(current_hp, Color(0.72, 0.05, 0.04, 1.0), Color(0.12, 0.02, 0.02, 0.95))
+	_apply_bar_style(current_resource, Color(0.08, 0.45, 0.95, 1.0), Color(0.02, 0.05, 0.12, 0.95))
 
 func bind_actor(actor: Combatant) -> void:
 	current_actor = actor
@@ -59,6 +62,25 @@ func clear_selected_skill() -> void:
 	target_hint.visible = false
 	for button in skill_buttons:
 		button.modulate = Color.WHITE
+
+func show_action(actor: Combatant, skill: Skill, affected_count: int) -> void:
+	action_log.text = "%s 施放 %s，命中 %d 个目标" % [actor.display_name, skill.display_name, affected_count]
+
+func _apply_bar_style(bar: ProgressBar, fill_color: Color, background_color: Color) -> void:
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = fill_color
+	fill.corner_radius_top_left = 4
+	fill.corner_radius_top_right = 4
+	fill.corner_radius_bottom_left = 4
+	fill.corner_radius_bottom_right = 4
+	var background := StyleBoxFlat.new()
+	background.bg_color = background_color
+	background.corner_radius_top_left = 4
+	background.corner_radius_top_right = 4
+	background.corner_radius_bottom_left = 4
+	background.corner_radius_bottom_right = 4
+	bar.add_theme_stylebox_override("fill", fill)
+	bar.add_theme_stylebox_override("background", background)
 
 func _on_skill_pressed(index: int) -> void:
 	if current_actor == null:
