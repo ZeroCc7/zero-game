@@ -4,5 +4,7 @@
 .appdata/
 .localappdata/
 godot-*.log
+*.log
 test-results.txt
 *.tmp
+assets/_sprite_runs/
